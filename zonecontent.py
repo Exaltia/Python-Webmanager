@@ -70,6 +70,7 @@ ii = 0
 allnames = list(f.names)
 zonenamelen = len(allnames)
 separator = ','
+#Loop for form crafting
 while ( i < zonenamelen):
 	currentzonename = allnames[i]
 	print "<br>"
@@ -81,7 +82,8 @@ while ( i < zonenamelen):
 	if cnames:
 		strcnames = str(cnames.items)
 		strcnames = strcnames.strip("[']")
-		print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (i, strcnames,fqdna) 
+		fqdnc = 'C' + separator + str(currentzonename) + separator + strcnames
+		print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (strcnames, strcnames, fqdnc) 
 	elif anames:
 		anameslen = len (anames.items)
 		if anameslen > 1:
@@ -93,22 +95,22 @@ while ( i < zonenamelen):
 				stri = ''
 				stri = str(i)
 				idandvalue = stri + separator + stranames
-				fqdna = str(currentzonename) + separator + stranames
+				fqdna = 'A' + separator + str(currentzonename) + separator + stranames
 				print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (stranames, stranames, fqdna)
 				ii = ii + 1
 		if anameslen < 2:
 			stranames = str(anames.items)
 			stranames = stranames.strip("[']")
+			fqdna = 'A' + separator + str(currentzonename) + separator + stranames
 			fqdna = str(currentzonename) + separator + stranames
 			print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (stranames, stranames, fqdna)
 	elif aaaanames:
 		ii = 0
-		print '<br> ii Value is : '
-		print ii
 		aaaanameslen = len (aaaanames.items)
 		while ii < anameslen:
 			straaaanames = str(aaaanames.items)
 			straaaanames = straaaanames.strip("[']")
+			fqdnaaaa = 'AAAA' + separator + str(currentzonename) + separator + straaaanames # Staying alive ! :)
 			print """<input type="text" id="Autre" name="Mmmonamemanualinput" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (straaaanames, fqdna)
 			ii = ii +1
 	elif txtnames:
@@ -117,6 +119,7 @@ while ( i < zonenamelen):
 		while ii < anameslen:
 			strtxtnames = str(txtnames.items)
 			strtxtnames = strtxtnames.strip("[']")
+			fqdntxt = 'TXT' + separator + str(currentzonename) + separator + strtxtnames
 			print """<input type="text" id="Autre" name="Mmmonamemanualinput" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (strtxtnames, fqdna)
 			ii = ii + 1
 	else:
