@@ -1,13 +1,12 @@
 #!/usr/bin/python
 # coding=UTF-8
+#Version 0.0.1Alpha
 import cgi
 import cgitb
 import os
 FinalZones = [] 
 try:
 	f = open('/etc/bind/named.conf.local', 'r')
-	#print "content-type:text/html\r\n\r\n"
-	#print f
 except:
 	print "content-type:text/html\r\n\r\n"
 	print '<html>'
@@ -26,12 +25,6 @@ for line in f.readlines():
 			li=li.strip('zone ')
 			li=li.strip('"')
 			FinalZones.append(li)
-#print FinalZones
-#FinalZones = str(FinalZones)
-#print type(FinalZones)
-#FinalZones = FinalZones.rstrip("\n")
-#print FinalZones
-#print config
 print "content-type:text/html\r\n\r\n"
 print '<html>'
 print '<head>'

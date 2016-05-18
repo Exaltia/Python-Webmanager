@@ -1,5 +1,15 @@
 #!/usr/bin/python
 # coding=UTF-8
+#Version 0.0.1Alpha
+#In order to handle IPV6 AAAA records correctly, you MUST edit file 
+#/usr/local/lib/python2.7/dist-packages/easyzone-1.2.2-py2.7.egg/easyzone/easyzone.py
+#and add the following code after line 337:
+#	elif rectype == 'AAAA':
+#        name = args[0]
+#        rd = dns.rdtypes.IN.AAAA.AAAA(dns.rdataclass.IN, dns.rdatatype.AAAA, name)
+# or switch to vimalloc forked version of easyzone
+#https://github.com/vimalloc/easyzone
+#Otherwize, zoneitemchange.py will return an error when adding the record
 import cgi
 import cgitb
 import os
@@ -70,61 +80,74 @@ ii = 0
 allnames = list(f.names)
 zonenamelen = len(allnames)
 separator = ','
+stranames = ''
+strcnames = ''
+straaaanames = ''
+strtxtnames = ''
 #Loop for form crafting
-while ( i < zonenamelen):
-	currentzonename = allnames[i]
-	print "<br>"
-	print currentzonename
-	cnames = f.names[currentzonename].records('CNAME')
-	anames = f.names[currentzonename].records('A')
-	aaaanames = f.names[currentzonename].records('AAAA')
-	txtnames = f.names[currentzonename].records('TXT')
-	if cnames:
-		strcnames = str(cnames.items)
-		strcnames = strcnames.strip("[']")
-		fqdnc = 'C' + separator + str(currentzonename) + separator + strcnames
-		print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (strcnames, strcnames, fqdnc) 
-	elif anames:
-		anameslen = len (anames.items)
-		if anameslen > 1:
-			#handle if there is more than 1 A record for a single fqdn
-			while ii < anameslen:
-				stranames = str(anames.items[ii])
-				stranames = stranames.strip("[']")
-				idandvalue = ''
-				stri = ''
-				stri = str(i)
-				idandvalue = stri + separator + stranames
-				fqdna = 'A' + separator + str(currentzonename) + separator + stranames
-				print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (stranames, stranames, fqdna)
+try:
+	while ( i < zonenamelen):
+		currentzonename = allnames[i]
+		print "<br>"
+		print currentzonename
+		cnames = f.names[currentzonename].records('CNAME')
+		anames = f.names[currentzonename].records('A')
+		aaaanames = f.names[currentzonename].records('AAAA')
+		txtnames = f.names[currentzonename].records('TXT')
+		if cnames:
+			ii = 0
+			cnameslen = len(cnames.items)
+			while ii < cnameslen:
+				strcnames = str(cnames.items)
+				strcnames = strcnames.strip("[']")
+				fqdnc = 'CNAME' + separator + str(currentzonename) + separator + strcnames
+				print '<hr>' + fqdnc + '<hr>'
+				print """IN CNAME <input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (strcnames, strcnames, fqdnc) 
 				ii = ii + 1
-		if anameslen < 2:
-			stranames = str(anames.items)
-			stranames = stranames.strip("[']")
-			fqdna = 'A' + separator + str(currentzonename) + separator + stranames
-			fqdna = str(currentzonename) + separator + stranames
-			print """<input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (stranames, stranames, fqdna)
-	elif aaaanames:
-		ii = 0
-		aaaanameslen = len (aaaanames.items)
-		while ii < anameslen:
-			straaaanames = str(aaaanames.items)
-			straaaanames = straaaanames.strip("[']")
-			fqdnaaaa = 'AAAA' + separator + str(currentzonename) + separator + straaaanames # Staying alive ! :)
-			print """<input type="text" id="Autre" name="Mmmonamemanualinput" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (straaaanames, fqdna)
-			ii = ii +1
-	elif txtnames:
-		ii = 0
-		txtnameslen = len (txtnames.items)
-		while ii < anameslen:
-			strtxtnames = str(txtnames.items)
-			strtxtnames = strtxtnames.strip("[']")
-			fqdntxt = 'TXT' + separator + str(currentzonename) + separator + strtxtnames
-			print """<input type="text" id="Autre" name="Mmmonamemanualinput" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (strtxtnames, fqdna)
-			ii = ii + 1
-	else:
-		print "Error, the zone has neither a CNAME, A or TXT records"
-	i = i + 1
+		elif anames:
+			anameslen = len (anames.items)
+			print anameslen
+			if anameslen > 1:
+				#handle if there is more than 1 A record for a single fqdn
+				while ii < anameslen:
+					stranames = str(anames.items[ii])
+					stranames = stranames.strip("[']")
+					idandvalue = ''
+					stri = ''
+					stri = str(i)
+					idandvalue = stri + separator + stranames
+					fqdna = 'A' + separator + str(currentzonename) + separator + stranames
+					print """IN A <input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (stranames, stranames, fqdna)
+					ii = ii + 1
+			if anameslen < 2:
+				stranames = str(anames.items)
+				stranames = stranames.strip("[']")
+				fqdna = 'A' + separator + str(currentzonename) + separator + stranames
+				print """IN A <input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (stranames, stranames, fqdna)
+		elif aaaanames:
+			ii = 0
+			aaaanameslen = len (aaaanames.items)
+			while ii < aaaanameslen:
+				straaaanames = str(aaaanames.items)
+				straaaanames = straaaanames.strip("[']")
+				fqdnaaaa = 'AAAA' + separator + str(currentzonename) + separator + straaaanames # Staying alive ! :)
+				print """IN AAAA <input type="text" id="Autre" name="%s" value="%s"><input type="radio" name="radiorecordbutton" value="%s">""" % (straaaanames, straaaanames, fqdnaaaa)
+				ii = ii +1
+		elif txtnames:
+			ii = 0
+			txtnameslen = len (txtnames.items)
+			while ii < txtnameslen:
+				strtxtnames = str(txtnames.items)
+				strtxtnames = strtxtnames.strip("""["']""")
+				fqdntxt = 'TXT' + separator + str(currentzonename) + separator + strtxtnames
+				print """IN TXT <input type="text" id="Autre" name="%s" value=%s><input type="radio" name="radiorecordbutton" value=%s>""" % (strtxtnames, strtxtnames, fqdntxt)
+				ii = ii + 1
+		# else:
+			# print 'the problematic record is: ' + stranames + strcnames + straaaanames + strtxtnames
+			# print "The zone has neither a CNAME, A or TXT records, is it still to be considered as an error?"
+		i = i + 1
+except:
+	print 'General error, contact admin if it occurs again'
 print '<br>'
 print '<input type="submit" name="action" value="Modifier">'
 print '<input type="submit" name= "action" value="Supprimer">'

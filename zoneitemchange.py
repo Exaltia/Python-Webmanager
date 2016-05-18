@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding=UTF-8
+#Version 0.0.1Alpha
 import cgi
 import cgitb
 import os
@@ -24,7 +25,6 @@ print
 radio = form.getvalue('radiorecordbutton')
 fqdna = form.getvalue('radiorecordbutton') # Variable name is not explicit anymore, see section starting with comment 'Loop for form crafting' for the content in zonecontent.py 
 fqdna = fqdna.split(',')
-print fqdna
 CurrentDomainName = str(C)
 CurrentDomainName = CurrentDomainName.split('=')
 for item in form.getlist('action'):
@@ -33,7 +33,7 @@ action = str(action)
 action = action.strip("[']")
 fqdn = str(fqdna[1])
 arecord = str(fqdna[2]) #variable name not explicit anymore too
-print arecord
+arecord = arecord.strip('"')
 if action == 'Modifier': # easyzone doesn't really have a modify function, forcing to do add then delete
 	currentrecord = arecord
 	newrecord = form.getvalue(arecord) 
@@ -43,7 +43,6 @@ if action == 'Modifier': # easyzone doesn't really have a modify function, forci
 		print "i am a list"
 	else:
 		wantedrecord = newrecord
-		print "i am not a list"
 	try:
 		recordtype = str(fqdna[0])
 		zonename = str(CurrentDomainName[1])
@@ -55,12 +54,10 @@ if action == 'Modifier': # easyzone doesn't really have a modify function, forci
 		test = str(test)
 		print '<br> test is ' + test
 	except:
-		print "fqdn is " + fqdn + " and record type is " + recordtype + " and arecord is " + arecord + "<br>"
-		print "wanted record is " + newrecord
-		print type('wantedrecord')
-		print type('recordtype')
-		print type('arecord')
-		print 'Foiré!'
+		if recordtype == 'TXT':
+			print 'TXT record modification currently unavailable, ask a admin, sorry' # Cause : " added somewhere, don't know if in lib or not ATM
+		else:
+			print 'Foiré!'
 		result = 'NOK' # easyzone check the record validity even before passing it to the isValid function
 elif action == 'Supprimer':
 	try:
@@ -74,7 +71,10 @@ elif action == 'Supprimer':
 		print '<br>'
 		print test
 	except:
-		print 'Couille dans le potage'
+		if recordtype == 'TXT':
+			print 'TXT record deletion currently unavailable, ask a admin, sorry' # Cause : " added somewhere, don't know if in lib or not ATM
+		else:
+			print 'Couille dans le potage'
 		result = 'NOK'
 else:
 	print 'Error'
